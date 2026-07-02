@@ -70,6 +70,22 @@ textarea {
     color: #ff6fa5;
     font-weight: 700;
 }
+
+.safety-card {
+    padding: 18px !important;
+    border-radius: 20px !important;
+    background-color: #eef6ff;
+    border: 2px solid #bcdcff;
+    margin-top: 16px;
+}
+.safety-card p {
+    margin: 0 0 8px 0;
+    color: #35618c;
+}
+.safety-card a {
+    color: #2a6fb0;
+    font-weight: 700;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -113,15 +129,15 @@ CATEGORY_MAPPING = {
 # （bible_categories.json の各節に付与されている tags と対応させることで、
 #   自由記述の内容にも合わせて聖句を選べるようにする。外部通信は一切なし）
 TEEN_KEYWORDS = {
-    "孤独": ["ひとりぼっち", "独りぼっち", "孤独", "誰も分かってくれない", "居場所がない", "一人が怖い"],
-    "自己肯定感": ["自分が嫌い", "自信がない", "価値がない", "自分なんて", "消えたい", "自分を好きになれない"],
+    "孤独": ["ひとりぼっち", "独りぼっち", "孤独", "誰も分かってくれない", "居場所がない", "一人が怖い", "話し相手がいない", "話せる人がいない", "相談できる人がいない", "誰とも話さない"],
+    "自己肯定感": ["自分が嫌い", "自信がない", "価値がない", "自分なんて", "消えたい", "自分を好きになれない", "きらい", "きらわれた", "死んじゃいたい", "消したい", "いなくなればいい"],
     "不安・恐れ": ["不安", "怖い", "心配", "どうしよう", "パニック"],
     "平安・安心": ["落ち着かない", "眠れない", "ざわざわ", "疲れた", "しんどい"],
     "赦し・罪悪感": ["罪悪感", "許せない", "後悔", "自分を責め"],
     "将来・進路": ["将来", "進路", "受験", "就職", "これから"],
     "人間関係・居場所": ["友達", "クラス", "いじめ", "仲間はずれ", "家族", "親"],
-    "力・弱さ": ["無理", "頑張れない", "力が出ない"],
-    "慰め・悲しみ": ["悲しい", "泣きたい", "涙", "辛い", "つらい"],
+    "力・弱さ": ["無理", "頑張れない", "力が出ない", "疲れ"],
+    "慰め・悲しみ": ["悲しい", "泣きたい", "涙", "辛い", "つらい", "もうダメ", "たすけて", "いやだ", "しても無駄だと思う"],
 }
 
 # テーマタグがヒットしたときに、あわせてスコアを加点するカテゴリ
@@ -157,6 +173,14 @@ def detect_themes(free_text: str) -> set:
     return hits
 
 
+# 希死念慮など、深刻さの高い言葉。ヒットしたら聖句とは別に相談窓口を案内する
+CRISIS_KEYWORDS = ["死にたい", "死んじゃいたい", "消えたい", "消したい", "いなくなればいい", "自殺"]
+
+
+def detect_crisis(free_text: str) -> bool:
+    return any(kw in free_text for kw in CRISIS_KEYWORDS)
+
+
 def choose_category(score: dict, hit_themes: set) -> str:
     boosted = dict(score)
     for theme in hit_themes:
@@ -173,6 +197,27 @@ def choose_verse(category: str, hit_themes: set) -> dict:
     verses = VERSES_DB.get(category, [])
     matched = [v for v in verses if hit_themes.intersection(v.get("tags", []))]
     return random.choice(matched) if matched else random.choice(verses)
+
+
+def choose_category_and_verse(score: dict, hit_themes: set):
+    # 自由記述からテーマが検出できた場合、選ばれたカテゴリの中だけを探すと
+    # 該当タグの聖句が無くて完全ランダムになってしまうことがある。
+    # そこで先に全カテゴリを横断してテーマに合う聖句を探し、
+    # 見つかった候補の中から回答スコアで重み付けして選ぶ。
+    if hit_themes:
+        candidates = [
+            (cat, v)
+            for cat, verses in VERSES_DB.items()
+            for v in verses
+            if hit_themes.intersection(v.get("tags", []))
+        ]
+        if candidates:
+            weights = [score.get(cat, 0) + 1 for cat, _ in candidates]
+            return random.choices(candidates, weights=weights, k=1)[0]
+
+    category = choose_category(score, hit_themes)
+    verse = choose_verse(category, hit_themes)
+    return category, verse
 
 
 # ================================
@@ -515,8 +560,8 @@ if st.button("あなたに贈るメッセージ"):
 
     score = score_categories(answers)
     hit_themes = detect_themes(free_text)
-    category = choose_category(score, hit_themes)
-    verse = choose_verse(category, hit_themes)
+    is_crisis = detect_crisis(free_text)
+    category, verse = choose_category_and_verse(score, hit_themes)
     link = bible_url_youversion(verse["verse"])
     message = random.choice(MESSAGES.get(category, [DEFAULT_MESSAGE]))
 
@@ -534,3 +579,19 @@ if st.button("あなたに贈るメッセージ"):
         """,
         unsafe_allow_html=True
     )
+
+    # 深刻な言葉が書かれていた場合は、相談窓口も案内する
+    if is_crisis:
+        st.markdown(
+            """
+            <div class="safety-card">
+                <p>でも、ここまで深刻なら、ひとりで抱えずに話してみて。信頼できる友達や家族、教会の仲間がいれば、その人にも話してみてね。</p>
+                <p>もし今すぐ話せる人がいなくても、
+                <a href="https://ibashochatwellness.jp/about" target="_blank">「あなたのいばしょ」（24時間365日・無料・匿名のチャット相談）</a>
+                があるよ。</p>
+                <p>神さまの愛をもっと味わいたいときは、こちらの聖書プランもおすすめだよ：
+                <a href="https://www.bible.com/reading-plans/55975-the-power-of-love-finding-rest-in-the-fathers-love" target="_blank">The Power of Love: Finding Rest in the Father's Love</a></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
