@@ -585,12 +585,12 @@ if st.button("あなたに贈るメッセージ"):
         st.markdown(
             """
             <div class="safety-card">
-                <p>ですが、ここまで深刻な思いを抱えているなら、一人で抱え込まずに話してみてください。信頼できるご家族やご友人、教会の兄弟姉妹がいれば、その方にも。</p>
+                <p>神さまの愛をもっと深く知りたい方には、こちらの聖書プランもおすすめです：
+                <a href="https://www.bible.com/reading-plans/55975-the-power-of-love-finding-rest-in-the-fathers-love" target="_blank">The Power of Love: Finding Rest in the Father's Love</a></p>
+                <p>ですが、ここまで深刻な思いを抱えているなら、一人で抱え込まずに話してみてください。信頼できる教会の兄弟姉妹や、ご家族、ご友人がいれば、その方にも。</p>
                 <p>もし今すぐ話せる相手がいなくても、
                 <a href="https://ibashochatwellness.jp/about" target="_blank">「あなたのいばしょ」（24時間365日・無料・匿名のチャット相談）</a>
                 があります。</p>
-                <p>神さまの愛をもっと深く知りたい方には、こちらの聖書プランもおすすめです：
-                <a href="https://www.bible.com/reading-plans/55975-the-power-of-love-finding-rest-in-the-fathers-love" target="_blank">The Power of Love: Finding Rest in the Father's Love</a></p>
             </div>
             """,
             unsafe_allow_html=True
