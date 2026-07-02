@@ -8,13 +8,20 @@ import urllib.parse
 st.set_page_config(page_title="🌿 祈りノート", page_icon="🌿", layout="centered")
 
 # ================================
-# CSS：スマホ最適化 & UI調整
+# CSS：スマホ最適化 & UI調整（パステルピンク×丸みフォント）
 # ================================
 st.markdown("""
 <style>
-html, body, div, p {
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap');
+
+html, body, div, p, span, label, textarea, button {
+    font-family: 'M PLUS Rounded 1c', sans-serif !important;
     font-size: 17px !important;
     line-height: 1.7 !important;
+}
+
+.stApp {
+    background: linear-gradient(180deg, #fff5fa 0%, #ffe6f2 100%);
 }
 
 .block-container {
@@ -22,26 +29,46 @@ html, body, div, p {
     padding-right: 1rem !important;
 }
 
+h1 {
+    color: #ff6fa5 !important;
+    font-weight: 800 !important;
+}
+
 div.stButton > button {
     width: 100% !important;
     padding: 14px 0 !important;
-    border-radius: 10px !important;
+    border-radius: 24px !important;
     font-size: 18px !important;
+    font-weight: 700 !important;
+    background-color: #ffb6d5 !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(255, 140, 180, 0.35) !important;
+}
+
+div.stButton > button:hover {
+    background-color: #ff9dc4 !important;
 }
 
 textarea {
     font-size: 16px !important;
+    border-radius: 16px !important;
+    border: 2px solid #ffd1e3 !important;
 }
+
 .card {
     padding: 18px !important;
-    border-radius: 14px !important;
-    background-color: #fff8e8;
-    border: 1px solid #e9d7b7;
+    border-radius: 20px !important;
+    background-color: #fff0f6;
+    border: 2px solid #ffc2dd;
     margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(255, 140, 180, 0.2);
 }
 .card-title {
     margin: 0 0 8px 0;
     font-size: 18px;
+    color: #ff6fa5;
+    font-weight: 700;
 }
 </style>
 """, unsafe_allow_html=True)
