@@ -174,7 +174,7 @@ def detect_themes(free_text: str) -> set:
 
 
 # 希死念慮など、深刻さの高い言葉。ヒットしたら聖句とは別に相談窓口を案内する
-CRISIS_KEYWORDS = ["死にたい", "自分を消したい", "いなくなった方がいい", "消えてしまいたい", "自殺"]
+CRISIS_KEYWORDS = ["死にたい", "自分を消したい", "いなくなった方がいい", "いなくなってしまいたい", "いなくなりたい", "消えてしまいたい", "自殺"]
 
 
 def detect_crisis(free_text: str) -> bool:
