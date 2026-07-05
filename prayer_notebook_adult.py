@@ -255,11 +255,11 @@ def choose_category(score: dict, hit_themes: set) -> str:
     for theme in hit_themes:
         for cat in THEME_TO_CATEGORY.get(theme, []):
             boosted[cat] += 2
-    # 上位カテゴリだけに絞らず、スコア比率で重み付き抽選する
-    # （+1の下駄で、スコア0のカテゴリにも小さな可能性を残す）
-    categories = list(boosted.keys())
-    weights = [boosted[c] + 1 for c in categories]
-    return random.choices(categories, weights=weights, k=1)[0]
+    # 関連性の低いカテゴリが選ばれないよう、最高スコアのカテゴリ
+    # （同点なら複数）だけを候補にする
+    max_score = max(boosted.values())
+    top_categories = [c for c, s in boosted.items() if s == max_score]
+    return random.choice(top_categories)
 
 
 def choose_verse(category: str, hit_themes: set) -> dict:
