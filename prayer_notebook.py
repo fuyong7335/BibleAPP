@@ -123,11 +123,61 @@ with open(JSON_PATH, "r", encoding="utf-8") as f:
 
 
 # ================================
-# YouVersion 検索リンク
+# YouVersion 直接リンク
 # ================================
+YOUVERSION_VERSION_ID = "83"
+
+BOOK_CODES = {
+    "ヨハネ福音書": "JHN",
+    "ローマ人への手紙": "ROM",
+    "エレミヤ書": "JER",
+    "第1ヨハネ": "1JN",
+    "エペソ人への手紙": "EPH",
+    "第1コリント": "1CO",
+    "マタイ福音書": "MAT",
+    "詩篇": "PSA",
+    "イザヤ書": "ISA",
+    "ゼパニヤ書": "ZEP",
+    "ガラテヤ書": "GAL",
+    "第2コリント": "2CO",
+    "ピリピ人への手紙": "PHP",
+    "第1ペテロ": "1PE",
+    "コロサイ人への手紙": "COL",
+    "使徒の働き": "ACT",
+    "第2テモテ": "2TI",
+    "第1テサロニケ": "1TH",
+    "エゼキエル書": "EZK",
+    "ユダの手紙": "JUD",
+    "箴言": "PRO",
+    "民数記": "NUM",
+    "ヘブル人への手紙": "HEB",
+    "ルカ福音書": "LUK",
+    "申命記": "DEU",
+    "創世記": "GEN",
+    "マラキ書": "MAL",
+    "テトス書": "TIT",
+    "第1列王記": "1KI",
+    "第2列王記": "2KI",
+    "マルコ福音書": "MRK",
+}
+
+
 def bible_url_youversion(verse_label: str) -> str:
+    # 書名が長いものから順にマッチさせる（"第1コリント"などの誤マッチを防ぐ）
+    for book_name in sorted(BOOK_CODES.keys(), key=len, reverse=True):
+        if verse_label.startswith(book_name):
+            code = BOOK_CODES[book_name]
+            rest = verse_label[len(book_name):]
+            if ":" in rest:
+                chapter, verse = rest.split(":", 1)
+            else:
+                # ユダの手紙など、章がなく節番号だけの書
+                chapter, verse = "1", rest
+            return f"https://www.bible.com/bible/{YOUVERSION_VERSION_ID}/{code}.{chapter}.{verse}"
+
+    # マッチしない場合は検索ページにフォールバック
     q = urllib.parse.quote(verse_label)
-    return f"https://www.bible.com/ja/search/bible?q={q}&version=83"
+    return f"https://www.bible.com/ja/search/bible?q={q}&version={YOUVERSION_VERSION_ID}"
 
 
 # ================================
