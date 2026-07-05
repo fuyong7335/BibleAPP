@@ -34,6 +34,25 @@ h1 {
     font-weight: 800 !important;
 }
 
+h3 {
+    color: #ff6fa5 !important;
+    font-weight: 700 !important;
+    margin-top: 36px !important;
+    margin-bottom: 12px !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 20px !important;
+    border-color: #ffd1e3 !important;
+    background-color: #fffafc !important;
+    padding: 6px !important;
+    margin-bottom: 20px !important;
+}
+
+div.stButton {
+    margin-top: 24px !important;
+}
+
 div.stButton > button {
     width: 100% !important;
     padding: 14px 18px !important;
@@ -509,6 +528,8 @@ st.caption(f"最終更新日：{datetime.date.today()}")
 
 st.write("今日、モヤモヤすることがあったら  \n神さまにきいてもらおう。")
 
+st.markdown("### 🌿 今のあなたの気持ちを聞かせてね")
+
 questions = {
     1: "気持ちがざわざわしたり、落ち着かない瞬間があった。",
     2: "自分が誰にも受け入れられていない気がする。自分のことを好きになれない時がある。",
@@ -520,15 +541,19 @@ questions = {
 }
 
 answers = {}
-for q_num, q_text in questions.items():
-    answers[q_num] = st.radio(
-        f"{q_num}. {q_text}",
-        ["はい", "どちらでもない", "いいえ"],
-        horizontal=True,
-        key=f"q{q_num}"
-    )
+with st.container(border=True):
+    for q_num, q_text in questions.items():
+        answers[q_num] = st.radio(
+            f"{q_num}. {q_text}",
+            ["はい", "どちらでもない", "いいえ"],
+            horizontal=True,
+            key=f"q{q_num}"
+        )
 
-free_text = st.text_area("何かいいたいことはある？", height=200)
+st.markdown("### 💬 自由に書いてみよう")
+
+with st.container(border=True):
+    free_text = st.text_area("何かいいたいことはある？", height=200, label_visibility="collapsed")
 
 
 # ================================
